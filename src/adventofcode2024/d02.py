@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Iterable, Sequence
 
 
@@ -17,10 +18,15 @@ def part2(input_: Iterable[str]) -> int:
     def can_fix_sequence(seq: Sequence[int]) -> bool:
         tails = [(seq[0], True, False), (seq[0], False, False)]
         for val in seq[1:]:
-            tails = (
+            new_tails = (
                 *((val, is_ascending, value_dropped) for tail, is_ascending, value_dropped in tails if (0 < val - tail <= 3 if is_ascending else 0 < tail - val <= 3)),
                 *((tail, is_ascending, True) for tail, is_ascending, value_dropped in tails if not value_dropped)
             )
+            dedupe = defaultdict(lambda: True)
+            for tail, is_ascending, value_dropped in new_tails:
+                dedupe[tail, is_ascending] &= value_dropped
+            tails = tuple((*key, value) for key, value in dedupe.items())
+
             if not tails:
                 return False
         return True
