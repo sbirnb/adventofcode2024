@@ -29,7 +29,7 @@ def part2(input_: Iterable[str]) -> int:
 
 
 if __name__ == '__main__':
-    with open('../../data/d04.txt', 'r') as fi:
+    with open('../../data/d05.txt', 'r') as fi:
         input_ = tuple(fi)
     print(part1(input_))
     print(part2(input_))
