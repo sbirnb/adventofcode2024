@@ -1,6 +1,6 @@
 import cProfile
 from heapq import heappush, heappop
-from itertools import chain, starmap, accumulate
+from itertools import chain, accumulate
 from typing import Iterable, Sequence, Tuple, Iterator
 
 
