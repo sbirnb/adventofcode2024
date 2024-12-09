@@ -31,7 +31,7 @@ def part1(input_: Iterable[str]) -> int:
 
 def part2(input_: Iterable[str]) -> int:
     widths = parse_input(input_)
-    free_heaps = [[] for _ in range(11)]
+    free_heaps = [[] for _ in range(10)]
     fragmented_blocks = []
 
     for i, (width, fs_ptr) in enumerate(zip(widths, accumulate(chain((0,), widths)))):
