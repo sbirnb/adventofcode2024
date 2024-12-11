@@ -1,4 +1,5 @@
 from collections import defaultdict, Counter
+from functools import lru_cache
 from typing import Iterable, Sequence, Mapping
 
 
@@ -6,14 +7,14 @@ def parse_input(input_: Iterable[str]) -> Sequence[int]:
     return tuple(map(int,next(iter(input_)).strip().split()))
 
 
-def get_next_stones(stone: int) -> Iterable[int]:
+@lru_cache(maxsize=None)
+def get_next_stones(stone: int) -> Sequence[int]:
     if stone == 0:
         return (1,)
     elif (l := len(s := str(stone))) % 2 == 0:
         return (int(s[:l//2]), int(s[l//2:]))
     else:
         return (stone * 2024,)
-
 
 def get_next_state(state: Mapping[int, int]) -> Mapping[int, int]:
     next_state = defaultdict(int)
