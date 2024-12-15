@@ -15,9 +15,7 @@ def sign(x: int) -> int:
 
 
 def part1(input_: Iterable[str], dims: Tuple[int, int] = (101, 103)) -> int:
-
     quadrant_counts = Counter(tuple(sign((x + 100 * dx) % dim - dim // 2) for x, dx, dim in zip(p, d, dims)) for p, d in parse_input(input_))
-    print(quadrant_counts)
     return reduce(mul, (count for quad, count in quadrant_counts.items() if 0 not in quad))
 
 
