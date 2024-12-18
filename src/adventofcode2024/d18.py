@@ -1,6 +1,6 @@
 import heapq
-from itertools import islice
-from typing import Iterable, Iterator, Any, Collection, Sequence, Set
+from itertools import islice, count
+from typing import Iterable, Iterator, Any, Collection, Sequence
 
 
 def parse_input(input_: Iterable[str]) -> Iterator[complex]:
@@ -48,16 +48,17 @@ def part2(input_: Iterable[str]) -> str:
     dim = 71
     bytes_ = tuple(parse_input(input_))
     start, end = 0, complex(dim - 1, dim - 1)
-    byte_set = set()
-    path_bytes_ = set(get_dist(start, end, dim, byte_set))
-    recalc = 1
-    for b in bytes_:
-        byte_set.add(b)
-        if b in path_bytes_:
-            recalc += 1
-            path_bytes_ = get_dist(start, end, dim, byte_set)
-            if path_bytes_ is None:
-                return f'{int(b.real)},{int(b.imag)}'
+    left, right = 1, len(bytes_) + 1
+    while left < right:
+        mid = (left + right) // 2
+        byte_set = set(bytes_[:mid])
+        path_bytes = get_dist(start, end, dim, byte_set)
+        if path_bytes is None:
+            right = mid - 1
+        else:
+            path_bytes_set = set(path_bytes)
+            left = next(index for index, byte_ in enumerate(bytes_[mid:], mid) if byte_ in path_bytes_set)
+    return f'{int(bytes_[left].real)},{int(bytes_[left].imag)}'
 
 
 if __name__ == '__main__':
