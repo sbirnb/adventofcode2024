@@ -7,7 +7,6 @@ def parse_input(input_: Iterable[str]) -> Sequence[int]:
     return tuple(map(int,next(iter(input_)).strip().split()))
 
 
-@lru_cache(maxsize=None)
 def get_next_stones(stone: int) -> Sequence[int]:
     if stone == 0:
         return (1,)
