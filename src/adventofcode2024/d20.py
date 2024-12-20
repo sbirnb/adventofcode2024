@@ -1,5 +1,4 @@
-from collections import defaultdict
-from typing import Iterable, Tuple, Collection, Sequence, Set, Mapping
+from typing import Iterable, Tuple, Set, Mapping
 
 
 def parse_input(input_: Iterable[str]) -> Tuple[complex, complex, Set[complex]]:
