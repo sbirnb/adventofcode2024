@@ -1,4 +1,4 @@
-from typing import Iterable, Tuple, Set, Mapping
+from typing import Iterable, Tuple, Set, Mapping, Iterator
 
 
 def parse_input(input_: Iterable[str]) -> Tuple[complex, complex, Set[complex]]:
@@ -14,12 +14,16 @@ def parse_input(input_: Iterable[str]) -> Tuple[complex, complex, Set[complex]]:
     return start, end, walls
 
 
+def get_path(start: complex, end: complex, walls: Set[complex]) -> Iterator[complex]:
+    prev, current = None, start
+    yield start
+    while current != end:
+        prev, current = current, next(adjacent for d in (-1, 1, 1j, -1j) if (adjacent := d + current) not in walls and adjacent != prev)
+        yield current
+
+
 def get_dists_along_path(start: complex, end: complex, walls: Set[complex]) -> Mapping[complex, int]:
-    path = [None, start]
-    while path[-1] != end:
-        path.append(next(
-            adjacent for d in (-1, 1, 1j, -1j) if (adjacent := d + path[-1]) not in walls and adjacent != path[-2]))
-    return {node: dist for dist, node in enumerate(node for node in path if node is not None)}
+    return {node: dist for dist, node in enumerate(node for node in get_path(start, end, walls) if node is not None)}
 
 
 def part1(input_: Iterable[str]) -> int:
@@ -32,23 +36,34 @@ def part1(input_: Iterable[str]) -> int:
 
 
 def part2(input_: Iterable[str]) -> int:
-    dists = get_dists_along_path(*parse_input(input_))
+    threshold, radius = 100, 20
+    start, end, walls = parse_input(input_)
+    path = tuple(get_path(start, end, walls))
+    dists = {node: dist for dist, node in enumerate(node for node in path if node is not None)}
 
     def cdist(n: complex) -> int:
         return int(abs(n.real) + abs(n.imag))
 
-    cheats = 0
-    for node1, dist1 in dists.items():
-        for c_rows in range(0, 21):
-            for c_cols in range(abs(c_rows) - 20 if c_rows else 0, 21 - abs(c_rows)):
-                node2 = complex(c_rows, c_cols) + node1
-                cheats += node2 in dists and abs(dists[node2] - dist1) - cdist(node1 - node2) >= 100
+    def update_window(pos1: complex, pos2: complex) -> int:
+        window.remove(pos2)
+        dir_ = pos2 - pos1
+        for i in range(-radius, radius + 1):
+            offset = (radius - abs(i) + i * 1j) * dir_
+            back, front = pos1 - offset, pos2 + offset
+            window.discard(back)
+            if dists.get(front, 0) > dists[pos2]:
+                window.add(front)
 
+    window = {node for row in range(-radius, radius + 1) for col in range(abs(row) - radius, radius + 1 - abs(row)) if dists.get(node := start + complex(row, col), 0) > 0}
+    cheats = 0
+    for pos1, pos2 in zip(path, path[1:]):
+        cheats += sum(dists[node] - dists[pos1] - cdist(node - pos1) >= threshold for node in window)
+        update_window(pos1, pos2)
     return cheats
+
 
 if __name__ == '__main__':
     with open('../../data/d20.txt', 'r') as fi:
         input_ = tuple(fi)
     print(part1(input_))
     print(part2(input_))
-
